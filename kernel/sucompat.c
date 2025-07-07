@@ -65,9 +65,11 @@ int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
 	}
 #endif
 
+#ifndef CONFIG_KSU_SUSFS_SUS_SU
 	if (!ksu_is_allow_uid(current_uid().val)) {
 		return 0;
 	}
+#endif
 
 	char path[sizeof(su) + 1];
 	memset(path, 0, sizeof(path));
@@ -86,10 +88,6 @@ struct filename* susfs_ksu_handle_stat(int *dfd, const char __user **filename_us
 	struct filename *name = getname_flags(*filename_user, getname_statx_lookup_flags(*flags), NULL);
 
 	if (unlikely(IS_ERR(name) || name->name == NULL)) {
-		return name;
-	}
-
-	if (!ksu_is_allow_uid(current_uid().val)) {
 		return name;
 	}
 
@@ -113,9 +111,11 @@ int ksu_handle_stat(int *dfd, const char __user **filename_user, int *flags)
 	}
 #endif
 
+#ifndef CONFIG_KSU_SUSFS_SUS_SU
 	if (!ksu_is_allow_uid(current_uid().val)) {
 		return 0;
 	}
+#endif
 
 	if (unlikely(!filename_user)) {
 		return 0;
@@ -172,8 +172,10 @@ int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
 	if (likely(memcmp(filename->name, su, sizeof(su))))
 		return 0;
 
+#ifndef CONFIG_KSU_SUSFS_SUS_SU
 	if (!ksu_is_allow_uid(current_uid().val))
 		return 0;
+#endif
 
 	pr_info("do_execveat_common su found\n");
 	memcpy((void *)filename->name, ksud_path, sizeof(ksud_path));
