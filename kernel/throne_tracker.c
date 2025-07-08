@@ -86,10 +86,10 @@ static void crown_manager(const char *apk, struct list_head *uid_data, int signa
 	list_for_each_entry (np, list, list) {
 		if (strncmp(np->package, pkg, KSU_MAX_PACKAGE_NAME) == 0) {
 			pr_info("Crowning manager: %s(uid=%d, signature_index=%d)\n", pkg, np->uid, signature_index);
-			
+
 			if (signature_index == 1 || signature_index == 2) {
 				ksu_add_manager(np->uid, signature_index);
-				
+
 				if (!ksu_is_manager_uid_valid()) {
 					ksu_set_manager_uid(np->uid);
 				}
@@ -202,10 +202,10 @@ FILLDIR_RETURN_TYPE my_actor(struct dir_context *ctx, const char *name,
 
 			pr_info("Found new base.apk at path: %s, is_multi_manager: %d, signature_index: %d\n",
 				dirpath, is_multi_manager, signature_index);
-				
+	
 			if (is_multi_manager && (signature_index == 1 || signature_index == 2)) {
 				crown_manager(dirpath, my_ctx->private_data, signature_index);
-				
+
 				struct apk_path_hash *apk_data = kmalloc(sizeof(struct apk_path_hash), GFP_ATOMIC);
 				if (apk_data) {
 					apk_data->hash = hash;
@@ -397,7 +397,7 @@ void ksu_track_throne()
 			manager_exist = true;
 			break;
 		}
-		
+
 		if (ksu_is_any_manager(np->uid)) {
 			manager_exist = true;
 		}
