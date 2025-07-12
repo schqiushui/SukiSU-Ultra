@@ -608,7 +608,7 @@ int ksu_handle_prctl(int option, unsigned long arg2, unsigned long arg3,
 	}
 
 	// Checking hook usage
-	if (arg2 == CMD_HOOK_TYPE) {
+	if (arg2 == CMD_HOOK_TYPE || arg2 == CMD_HOOK_MODE) {
 		const char *hook_type;
 		
 #ifdef CONFIG_KSU_MANUAL_HOOK
