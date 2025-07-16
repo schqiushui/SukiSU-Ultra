@@ -480,6 +480,24 @@ int ksu_handle_prctl(int option, unsigned long arg2, unsigned long arg3,
 		return 0;
 	}
 
+	// Get hook type status
+	if (arg2 == CMD_HOOK_TYPE || arg2 == CMD_HOOK_MODE) {
+#ifdef CONFIG_KSU_MANUAL_HOOK
+		const char *hook_type = "Manual";
+#else
+		const char *hook_type = "Kprobes";
+#endif
+		if (copy_to_user((void __user *)arg3, hook_type, strlen(hook_type) + 1)) {
+			pr_err("hook_type: copy_to_user failed\n");
+			return 0;
+		}
+
+		if (copy_to_user(result, &reply_ok, sizeof(reply_ok))) {
+			pr_err("hook_type: prctl reply error\n");
+		}
+		return 0;
+	}
+
 	if (arg2 == CMD_REPORT_EVENT) {
 		if (!from_root) {
 			return 0;
@@ -605,30 +623,6 @@ int ksu_handle_prctl(int option, unsigned long arg2, unsigned long arg3,
     	if (copy_to_user((void __user *)arg3, &KPM_Enabled, sizeof(KPM_Enabled)))
         	pr_info("KPM: copy_to_user() failed\n");
     	return 0;
-	}
-
-	// Checking hook usage
-	if (arg2 == CMD_HOOK_TYPE || arg2 == CMD_HOOK_MODE) {
-		const char *hook_type;
-		
-#ifdef CONFIG_KSU_MANUAL_HOOK
-		hook_type = "Manual";
-#elif defined(CONFIG_KSU_KPROBES_HOOK)
-		hook_type = "Kprobes";
-#else
-		hook_type = "Unknown";
-#endif
-		
-		size_t len = strlen(hook_type) + 1;
-		if (copy_to_user((void __user *)arg3, hook_type, len)) {
-			pr_err("hook_type: copy_to_user failed\n");
-			return 0;
-		}
-		
-		if (copy_to_user(result, &reply_ok, sizeof(reply_ok))) {
-			pr_err("hook_type: prctl reply error\n");
-		}
-		return 0;
 	}
 
 	// Get SUSFS function status
