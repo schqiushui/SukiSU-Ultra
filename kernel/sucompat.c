@@ -71,12 +71,8 @@ int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
 	}
 #endif
 
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
-	char path[sizeof(su)] = {0};
-#else
 	char path[sizeof(su) + 1];
 	memset(path, 0, sizeof(path));
-#endif
 	ksu_strncpy_from_user_nofault(path, *filename_user, sizeof(path));
 
 	if (unlikely(!memcmp(path, su, sizeof(su)))) {
@@ -125,12 +121,8 @@ int ksu_handle_stat(int *dfd, const char __user **filename_user, int *flags)
 		return 0;
 	}
 
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
-	char path[sizeof(su)] = {0};
-#else
 	char path[sizeof(su) + 1];
 	memset(path, 0, sizeof(path));
-#endif
 // Remove this later!! we use syscall hook, so this will never happen!!!!!
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 18, 0) && 0
 	// it becomes a `struct filename *` after 5.18
@@ -197,12 +189,8 @@ int ksu_handle_execve_sucompat(int *fd, const char __user **filename_user,
 			       void *__never_use_argv, void *__never_use_envp,
 			       int *__never_use_flags)
 {
-	//const char su[] = SU_PATH;
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
-	char path[sizeof(su)] = {0};
-#else
+	// const char su[] = SU_PATH;
 	char path[sizeof(su) + 1];
-#endif
 
 #ifndef CONFIG_KSU_KPROBES_HOOK
 	if (!ksu_sucompat_hook_state) {
