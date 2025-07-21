@@ -413,7 +413,7 @@ void ksu_track_throne()
 		search_manager("/data/app", 2, &uid_list);
 		pr_info("Search manager finished\n");
 	}
-	
+
 prune:
 	// then prune the allowlist
 	ksu_prune_allowlist(is_uid_exist, &uid_list);
