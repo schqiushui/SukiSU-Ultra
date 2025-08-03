@@ -12,6 +12,7 @@
 #include "manager.h"
 #include "throne_tracker.h"
 #include "kernel_compat.h"
+#include "dynamic_sign.h"
 
 uid_t ksu_manager_uid = KSU_INVALID_UID;
 
@@ -387,8 +388,10 @@ void ksu_track_throne()
 	struct uid_data *np;
 	struct uid_data *n;
 
-	// first, check if manager_uid exist!
+	// Check if any manager exists (traditional or dynamic)
 	bool manager_exist = false;
+	
+	// Check for traditional manager
 	list_for_each_entry (np, &uid_list, list) {
 		// if manager is installed in work profile, the uid in packages.list is still equals main profile
 		// don't delete it in this case!
@@ -398,8 +401,12 @@ void ksu_track_throne()
 			break;
 		}
 
-		if (ksu_is_any_manager(np->uid)) {
-			manager_exist = true;
+		// Check for dynamic managers
+		if (ksu_is_dynamic_sign_enabled()) {
+			if (ksu_is_any_manager(np->uid)) {
+				manager_exist = true;
+				break;
+			}
 		}
 	}
 
