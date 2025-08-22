@@ -398,15 +398,16 @@ void ksu_track_throne()
 		int manager_uid = ksu_get_manager_uid() % 100000;
 		if (np->uid == manager_uid) {
 			manager_exist = true;
-			break;
+			if (!ksu_is_dynamic_sign_enabled()) {
+				break;
+			}
+			continue;
 		}
 
 		// Check for dynamic managers
-		if (ksu_is_dynamic_sign_enabled()) {
-			if (ksu_is_any_manager(np->uid)) {
-				manager_exist = true;
-				break;
-			}
+		if (ksu_is_any_manager(np->uid)) {
+			manager_exist = true;
+			break;
 		}
 	}
 
