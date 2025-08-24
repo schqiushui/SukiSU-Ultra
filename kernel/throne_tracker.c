@@ -12,7 +12,7 @@
 #include "manager.h"
 #include "throne_tracker.h"
 #include "kernel_compat.h"
-#include "dynamic_sign.h"
+#include "dynamic_manager.h"
 
 uid_t ksu_manager_uid = KSU_INVALID_UID;
 
@@ -199,7 +199,7 @@ FILLDIR_RETURN_TYPE my_actor(struct dir_context *ctx, const char *name,
 			}
 
 			int signature_index = -1;
-			bool is_multi_manager = ksu_is_multi_manager_apk(dirpath, &signature_index);
+			bool is_multi_manager = ksu_is_dynamic_manager_apk(dirpath, &signature_index);
 
 			pr_info("Found new base.apk at path: %s, is_multi_manager: %d, signature_index: %d\n",
 				dirpath, is_multi_manager, signature_index);
@@ -398,7 +398,7 @@ void ksu_track_throne()
 		int manager_uid = ksu_get_manager_uid() % 100000;
 		if (np->uid == manager_uid) {
 			manager_exist = true;
-			if (!ksu_is_dynamic_sign_enabled()) {
+			if (!ksu_is_dynamic_manager_enabled()) {
 				break;
 			}
 			continue;
