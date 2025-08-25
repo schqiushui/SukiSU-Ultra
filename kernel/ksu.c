@@ -59,7 +59,7 @@ extern void ksu_sucompat_exit();
 extern void ksu_ksud_init();
 extern void ksu_ksud_exit();
 
-int __init ksu_kernelsu_init(void)
+int __init kernelsu_init(void)
 {
 	pr_info("kernelsu.enabled=%d\n",
 		get_ksu_state());
@@ -108,7 +108,7 @@ int __init ksu_kernelsu_init(void)
 	return 0;
 }
 
-void ksu_kernelsu_exit(void)
+void kernelsu_exit(void)
 {
 #ifdef CONFIG_KSU_CMDLINE
 	if (!get_ksu_state()) {
@@ -129,8 +129,8 @@ void ksu_kernelsu_exit(void)
 	ksu_core_exit();
 }
 
-module_init(ksu_kernelsu_init);
-module_exit(ksu_kernelsu_exit);
+module_init(kernelsu_init);
+module_exit(kernelsu_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("weishu");
