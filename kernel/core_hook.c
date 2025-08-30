@@ -1150,26 +1150,28 @@ static bool should_umount(struct path *path)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0) || defined(KSU_HAS_PATH_UMOUNT)
 static void ksu_path_umount(const char *mnt, struct path *path, int flags)
 {
-	int ret = path_umount(path, flags);
-	pr_info("%s: path: %s ret: %d\n", __func__, mnt, ret);
+	int err = path_umount(path, flags);
+	if (err) {
+		pr_info("%s: umount path: %s failed, code: %d\n", __func__, mnt, err);
+	}
 }
 #else
 // TODO: Search a way to make this works without set_fs functions
 static void ksu_sys_umount(const char *mnt, int flags)
 {
 	char __user *usermnt = (char __user *)mnt;
-	mm_segment_t old_fs;
-	int ret; // although asmlinkage long
 
-	old_fs = get_fs();
+	mm_segment_t old_fs = get_fs();
 	set_fs(KERNEL_DS);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
-	ret = ksys_umount(usermnt, flags);
+	int err = ksys_umount(usermnt, flags);
 #else
-	ret = sys_umount(usermnt, flags); // cuz asmlinkage long sys##name
+	long err = sys_umount(usermnt, flags); // cuz asmlinkage long sys##name
 #endif
 	set_fs(old_fs);
-	pr_info("%s: path: %s ret: %d\n", __func__, usermnt, ret);
+	if (err) {
+		pr_info("%s: umount path: %s failed, code: %d\n", __func__, mnt, err);
+	}
 }
 #endif
 
