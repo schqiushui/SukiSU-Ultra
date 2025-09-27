@@ -68,6 +68,15 @@ else
   $(info -- $(REPO_NAME) version (Github): $(KSU_VERSION_FULL))
 endif
 
+ifeq ($(shell test -e $(srctree)/$(src)/../.git; echo $$?),0)
+KSU_VERSION_TAG := $(shell cd $(srctree)/$(src); /usr/bin/env PATH="$$PATH":/usr/bin:/usr/local/bin git describe --tags --abbrev=0 2>/dev/null)
+$(info -- KernelSU-Next tag: $(KSU_VERSION_TAG))
+ccflags-y += -DKSU_VERSION_TAG=\"$(KSU_VERSION_TAG)\"
+else
+$(warning "KSU_VERSION_TAG not defined! It is better to make KernelSU-Next a git submodule!")
+ccflags-y += -DKSU_VERSION_TAG=\"v0.0.0\"
+endif
+
 ccflags-y += -DKSU_VERSION=$(KSU_VERSION)
 ccflags-y += -DKSU_VERSION_FULL=\"$(KSU_VERSION_FULL)\"
 
