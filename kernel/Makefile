@@ -68,17 +68,25 @@ else
   $(info -- $(REPO_NAME) version (Github): $(KSU_VERSION_FULL))
 endif
 
-ifeq ($(shell test -e $(srctree)/$(src)/../.git; echo $$?),0)
-KSU_VERSION_TAG := $(shell cd $(srctree)/$(src); /usr/bin/env PATH="$$PATH":/usr/bin:/usr/local/bin git describe --tags --abbrev=0 2>/dev/null)
-$(info -- KernelSU-Next tag: $(KSU_VERSION_TAG))
-ccflags-y += -DKSU_VERSION_TAG=\"$(KSU_VERSION_TAG)\"
+# KernelSU-Next remote repo
+KSU_NEXT_REPO := https://github.com/KernelSU-Next/KernelSU-Next.git
+GIT_BIN := /usr/bin/env PATH="$$PATH":/usr/bin:/usr/local/bin git
+
+KSU_VERSION_TAG := $(shell $(GIT_BIN) ls-remote --tags $(KSU_NEXT_REPO) | \
+                    awk -F/ '{print $$3}' | \
+                    grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$$' | \
+                    sort -V | tail -n1)
+
+ifeq ($(KSU_VERSION_TAG),)
+  KSU_VERSION_TAG := v0.0.0
+  $(warning -- Could not fetch KernelSU-Next remote tag! Using fallback: $(KSU_VERSION_TAG))
 else
-$(warning "KSU_VERSION_TAG not defined! It is better to make KernelSU-Next a git submodule!")
-ccflags-y += -DKSU_VERSION_TAG=\"v0.0.0\"
+  $(info -- KernelSU-Next remote tag: $(KSU_VERSION_TAG))
 endif
 
 ccflags-y += -DKSU_VERSION=$(KSU_VERSION)
 ccflags-y += -DKSU_VERSION_FULL=\"$(KSU_VERSION_FULL)\"
+ccflags-y += -DKSU_VERSION_TAG=\"$(KSU_VERSION_TAG)\"
 
 ifeq ($(strip $(CONFIG_KSU_MANUAL_HOOK)),y)
 $(info -- SukiSU: Manual hooking enabled!)
