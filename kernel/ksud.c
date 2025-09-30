@@ -27,8 +27,6 @@
 #include "kernel_compat.h"
 #include "selinux/selinux.h"
 
-#define KERNEL_VERSION_5_10 KERNEL_VERSION(5, 10, 0)
-
 static const char KERNEL_SU_RC[] =
 	"\n"
 
@@ -606,35 +604,15 @@ static int input_handle_event_handler_pre(struct kprobe *p,
 	return ksu_handle_input_handle_event(type, code, value);
 }
 
-#if 1
 static struct kprobe execve_kp = {
 	.symbol_name = SYS_EXECVE_SYMBOL,
 	.pre_handler = sys_execve_handler_pre,
 };
-#else
-static struct kprobe execve_kp = {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0)
-	.symbol_name = "do_execveat_common",
-#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 0)
-	.symbol_name = "__do_execve_file",
-#elif LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
-	.symbol_name = "do_execveat_common",
-#endif
-	.pre_handler = execve_handler_pre,
-};
-#endif
 
-#if 1
 static struct kprobe vfs_read_kp = {
 	.symbol_name = SYS_READ_SYMBOL,
 	.pre_handler = sys_read_handler_pre,
 };
-#else
-static struct kprobe vfs_read_kp = {
-	.symbol_name = "vfs_read",
-	.pre_handler = vfs_read_handler_pre,
-};
-#endif
 
 static struct kprobe input_event_kp = {
 	.symbol_name = "input_event",
