@@ -78,7 +78,7 @@ KSU_VERSION_TAG := $(shell $(GIT_BIN) ls-remote --tags $(KSU_NEXT_REPO) | \
                     sort -V | tail -n1)
 
 ifeq ($(KSU_VERSION_TAG),)
-  KSU_VERSION_TAG := v0.0.0
+  KSU_VERSION_TAG := v1.1.1
   $(warning -- Could not fetch KernelSU-Next remote tag! Using fallback: $(KSU_VERSION_TAG))
 else
   $(info -- KernelSU-Next remote tag: $(KSU_VERSION_TAG))
